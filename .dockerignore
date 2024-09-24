@@ -8,3 +8,5 @@ build
 
 packages/server/.env
 packages/ui/.env
+
+!Dockerfile
