@@ -1,14 +1,16 @@
-version: '3.8'
+version: '3.1'
 
 services:
   flowise:
     image: flowiseai/flowise
-    ports:
-      - '3000:3000'
+    restart: always
     environment:
-      - PORT=3000
-      - FLOWISE_USERNAME=user
-      - FLOWISE_PASSWORD=password
+      - PORT=${PORT:-3000}
+      - FLOWISE_USERNAME=${FLOWISE_USERNAME:-user}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD:-password}
+      - FLOWISE_SECRETKEY_OVERWRITE=${FLOWISE_SECRETKEY_OVERWRITE:-myencryptionkey}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
     volumes:
       - ~/.flowise:/root/.flowise
-    restart: always
+    entrypoint: /bin/sh -c "sleep 3; flowise start"
