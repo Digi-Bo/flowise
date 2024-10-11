@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.2.2'
 
 services:
   flowise:
@@ -10,13 +10,32 @@ services:
       - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
       - FLOWISE_SECRETKEY_OVERWRITE=${FLOWISE_SECRETKEY_OVERWRITE}
       - DATABASE_TYPE=postgres
-      - DATABASE_HOST=${DATABASE_HOST}
-      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_HOST=flowise-db  # Nom du service PostgreSQL
+      - DATABASE_PORT=5434  # Utilise le port 5434 pour éviter le conflit
       - DATABASE_NAME=${DATABASE_NAME}
       - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
     ports:
-      - "${PORT}:${PORT}"
+      - "3000:3000"  # Flowise est exposé sur le port 3000
     volumes:
       - ~/.flowise:/root/.flowise
+    networks:
+      - flowise-network
     entrypoint: /bin/sh -c "sleep 3; flowise start"
+
+  flowise-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "5434:5432"  # PostgreSQL est exposé sur 5434 pour éviter le conflit avec 5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - flowise-network
+
+networks:
+  flowise-network:
+    driver: bridge
